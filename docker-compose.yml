@@ -1,0 +1,11 @@
+version: '3'
+services:
+  gemini-bot:
+    build: .
+    container_name: gemini-telegram-bot
+    restart: always
+    environment:
+      - TELEGRAM_BOT_API_KEY=${TELEGRAM_BOT_API_KEY}
+      - GEMINI_API_KEYS=${GEMINI_API_KEYS}
+    volumes:
+      - ./logs:/app/logs
