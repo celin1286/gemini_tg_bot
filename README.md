@@ -54,7 +54,7 @@ docker run -d --restart=always -e TELEGRAM_BOT_API_KEY={Telegram 机器人 API} 
 2. 在[Google AI Studio](https://makersuite.google.com/app/apikey)获取Gemini API keys
 3. 克隆项目
 ```
-git clone https://github.com/H-T-H/Gemini-Telegram-Bot.git
+git clone https://github.com/celin1286/gemini_tg_bot.git
 ```
 4. 进入项目目录
 ```
