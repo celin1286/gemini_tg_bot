@@ -1,83 +1,93 @@
-# Gemini-Bot
+# Gemini-TG-Bot
 
-A Telegram bot based on Google Gemini.
+A powerful Telegram bot powered by Google Gemini AI models.
 
-## Features
+## ✨ Key Features
 
-- [X] Basic conversation
-- [X] Context memory
-- [X] Image recognition
-- [X] Different modes for private/group chat
-- [X] Web search and summarization
+- Support for both gemini-2.0-flash and gemini-1.5-pro models
+- Intelligent context memory for coherent conversations
+- Image recognition and analysis
+- Smart adaptation for private/group chat scenarios
+- Integrated web search with summarization
+- Containerized deployment with Docker
 
-## Commands
+## 🤖 Commands
 
-• `/start` - Start using the bot
-• `/gemini` - Chat using gemini-2.0-flash model
-• `/gemini_pro` - Chat using gemini-1.5-pro model
-• `/clear` - Clear conversation history
-• `/switch` - Switch default model (private chat only)
-• `/search` - Search and summarize content in Chinese
+| Command | Description |
+|---------|-------------|
+| `/start` | Initialize and start using the bot |
+| `/gemini` | Chat using gemini-2.0-flash model |
+| `/gemini_pro` | Chat using gemini-1.5-pro model |
+| `/clear` | Clear current conversation history |
+| `/switch` | Switch default model (private chat only) |
+| `/search` | Search and get summarized content |
 
-## Search Feature
+## 🔍 Search Feature
 
-Using the `/search` command, you can:
+The `/search` command enables you to:
+- Input search terms in any language
+- Get results via DuckDuckGo search
+- Receive AI-powered summaries
+- View key points in a clear format
 
-1. Input Chinese search terms, which will be automatically translated to English
-2. Search using DuckDuckGo to get relevant results
-3. Have Gemini analyze and summarize results in Chinese
-4. Get key points summary
+Example: `/search latest AI developments 2024`
 
-Example:
+## 🚀 Deployment Guide
+
+### Method 1: Direct Deployment
+
+1. Clone the repository
+```bash
+git clone https://github.com/celin1286/gemini_tg_bot.git
+cd gemini_tg_bot
 ```
-/search controlled nuclear fusion latest progress
-```
 
-# Installation
-## (1) Linux System
-1. Install dependencies
-```
+2. Install dependencies
+```bash
 pip install -r requirements.txt
 ```
-2. Get Telegram Bot API Token from [BotFather](https://t.me/BotFather)
-3. Get Gemini API keys from [Google AI Studio](https://makersuite.google.com/app/apikey)
-4. Run the bot with command:
+
+3. Configure API Keys
+- Get Telegram Bot Token from [BotFather](https://t.me/BotFather)
+- Get Gemini API Key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+
+4. Start the service
+```bash
+export TELEGRAM_BOT_API_KEY="Your_TG_Bot_Token"
+export GEMINI_API_KEYS="Your_Gemini_API_Key"
+python bot.py
 ```
 
-## (2) Deploy with Docker
-### Using pre-built image (x86 only)
-```
-docker run -d --restart=always -e TELEGRAM_BOT_API_KEY={Telegram Bot API} -e GEMINI_API_KEYS={Gemini API Keys} qwqhthqwq/gemini-telegram-bot:main
-```
-### Build yourself
-1. Get Telegram Bot API from [BotFather](https://t.me/BotFather)
-2. Get Gemini API keys from [Google AI Studio](https://makersuite.google.com/app/apikey)
-3. Clone project
-```
-git clone https://github.com/H-T-H/Gemini-Telegram-Bot.git
-```
-4. Enter project directory
-```
-cd Gemini-Telegram-Bot
-```
-5. Build image
-```
+### Method 2: Docker Deployment
+
+```bash
+# Build image
 docker build -t gemini_tg_bot .
-```
-6. Run image
-```
-docker run -d --restart=always -e TELEGRAM_BOT_API_KEY={Telegram Bot API} -e GEMINI_API_KEYS={Gemini API Keys} gemini_tg_bot
+
+# Run container
+docker run -d --restart=always \
+  -e TELEGRAM_BOT_API_KEY="Your_TG_Bot_Token" \
+  -e GEMINI_API_KEYS="Your_Gemini_API_Key" \
+  gemini_tg_bot
 ```
 
-# Usage
-1. In private chat, directly send your questions
-2. In group chat, use **/gemini** or **/gemini_pro** + your question
-3. Use **/clear** to delete conversation history
-4. Use **/switch** to change default model in private chat
+## 💬 Usage Guide
 
-# References
-1. [https://github.com/yihong0618/tg_bot_collections](https://github.com/yihong0618/tg_bot_collections)
-2. [https://github.com/yym68686/md2tgmd](https://github.com/yym68686/md2tgmd)
+- Private Chat: Send messages directly
+- Group Chat: Use `/gemini` or `/gemini_pro` + your message
+- Use `/clear` to reset conversation history
+- Use `/switch` to change default model (private chat only)
+
+## 🤝 Contributing
+
+Issues and Pull Requests are welcome!
+
+## 📚 References
+
+- [Gemini-Telegram-Bot](https://github.com/H-T-H/Gemini-Telegram-Bot)
+- [tg_bot_collections](https://github.com/yihong0618/tg_bot_collections)
+- [md2tgmd](https://github.com/yym68686/md2tgmd)
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=H-T-H/Gemini-Telegram-Bot&type=Date)](https://star-history.com/#H-T-H/Gemini-Telegram-Bot&Date)
