@@ -43,12 +43,6 @@ pip install -r requirements.txt
 3. 在[Google AI Studio](https://makersuite.google.com/app/apikey)获取Gemini API keys
 4. 运行机器人，执行以下命令：
 ```
-
-## (2)使用 Docker 部署
-### 使用构建好的镜像(x86 only)
-```
-docker run -d --restart=always -e TELEGRAM_BOT_API_KEY={Telegram 机器人 API} -e GEMINI_API_KEYS={Gemini API 密钥} qwqhthqwq/gemini-telegram-bot:main
-```
 ### 自行构建
 1. 在[BotFather](https://t.me/BotFather)获取Telegram Bot API
 2. 在[Google AI Studio](https://makersuite.google.com/app/apikey)获取Gemini API keys
