@@ -2,6 +2,8 @@
 
 一个功能强大的 Telegram 机器人,基于 Google Gemini AI 模型打造。
 
+[English Document](https://github.com/celin1286/gemini_tg_bot/blob/main/README.en.md)
+
 ## ✨ 主要特性
 
 - 支持 gemini-2.0-flash 和 gemini-1.5-pro 两种模型
