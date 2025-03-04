@@ -69,15 +69,30 @@ jobs:
       - name: Create and push manifest
         if: github.event_name != 'pull_request'
         run: |
+          # 创建最新版本的 manifest
           docker manifest create \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-latest \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-latest
+            --amend ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-latest \
+            --amend ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-latest
           
+          # 创建带日期版本的 manifest
           docker manifest create \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }} \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-${{ env.VERSION }} \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-${{ env.VERSION }}
+            --amend ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-${{ env.VERSION }} \
+            --amend ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-${{ env.VERSION }}
           
+          # 为每个平台添加注解
+          docker manifest annotate ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-latest --os linux --arch amd64
+          docker manifest annotate ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-latest --os linux --arch arm64
+          
+          # 推送 manifests
           docker manifest push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           docker manifest push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+
+      # 验证构建结果
+      - name: Verify images
+        if: github.event_name != 'pull_request'
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
