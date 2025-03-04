@@ -10,7 +10,6 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: celin1286/gemini_tg_bot
-  # 添加当前时间作为版本号
   VERSION: 20250304
 
 jobs:
@@ -29,8 +28,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          platforms: linux/amd64,linux/arm64
 
       - name: Log into Docker Hub
         if: github.event_name != 'pull_request'
@@ -39,7 +36,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 分开构建不同平台的镜像
+      # AMD64 构建
       - name: Build and push AMD64 image
         uses: docker/build-push-action@v5
         with:
@@ -52,6 +49,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # ARM64 构建
       - name: Build and push ARM64 image
         uses: docker/build-push-action@v5
         with:
@@ -63,21 +61,23 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            BUILDKIT_STEP_LOG_MAX_SIZE=10485760
+            BUILDKIT_STEP_LOG_MAX_SPEED=10485760
 
-      # 创建并推送 manifest 列表
+      # 创建并推送 manifest
       - name: Create and push manifest
         if: github.event_name != 'pull_request'
         run: |
-          # 创建并推送 latest manifest
           docker manifest create \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-latest \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-latest
-          docker manifest push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-          # 创建并推送带版本号的 manifest
+          
           docker manifest create \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }} \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-${{ env.VERSION }} \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-${{ env.VERSION }}
+          
+          docker manifest push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           docker manifest push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
