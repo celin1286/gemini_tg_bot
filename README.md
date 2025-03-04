@@ -63,14 +63,11 @@ python bot.py
 ### 方式二：Docker 部署
 
 ```bash
-# 构建镜像
-docker build -t gemini_tg_bot .
-
-# 运行容器
+# 运行容器 AMD64
 docker run -d --restart=always \
   -e TELEGRAM_BOT_API_KEY="你的TG机器人Token" \
   -e GEMINI_API_KEYS="你的Gemini API密钥" \
-  gemini_tg_bot
+  celin1286/gemini_tg_bot:latest
 ```
 
 ## 💬 使用说明
