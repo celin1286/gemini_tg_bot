@@ -1,4 +1,4 @@
-name: Build and Push Docker Images
+name: Build and Push Docker Image
 
 on:
   push:
@@ -23,9 +23,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -36,7 +33,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # AMD64 构建
       - name: Build and push AMD64 image
         uses: docker/build-push-action@v5
         with:
@@ -44,55 +40,13 @@ jobs:
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-${{ env.VERSION }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      # ARM64 构建
-      - name: Build and push ARM64 image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          platforms: linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-${{ env.VERSION }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            BUILDKIT_STEP_LOG_MAX_SIZE=10485760
-            BUILDKIT_STEP_LOG_MAX_SPEED=10485760
-
-      # 创建并推送 manifest
-      - name: Create and push manifest
-        if: github.event_name != 'pull_request'
-        run: |
-          # 创建最新版本的 manifest
-          docker manifest create \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
-            --amend ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-latest \
-            --amend ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-latest
-          
-          # 创建带日期版本的 manifest
-          docker manifest create \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }} \
-            --amend ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-${{ env.VERSION }} \
-            --amend ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-${{ env.VERSION }}
-          
-          # 为每个平台添加注解
-          docker manifest annotate ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:amd64-latest --os linux --arch amd64
-          docker manifest annotate ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:arm64-latest --os linux --arch arm64
-          
-          # 推送 manifests
-          docker manifest push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          docker manifest push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
 
       # 验证构建结果
-      - name: Verify images
+      - name: Verify image
         if: github.event_name != 'pull_request'
         run: |
           docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
