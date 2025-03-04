@@ -25,7 +25,7 @@ RUN pip config set global.progress_bar off && \
 # 设置 Rust 环境变量
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 ENV RUSTFLAGS="-C target-feature=-crt-static"
-ENV PIP_DEFAULT_TIMEOUT=100
+ENV PIP_DEFAULT_TIMEOUT=200
 
 # 安装依赖
 WORKDIR /app
@@ -46,12 +46,17 @@ RUN pip install --no-cache-dir google-generativeai && \
 # 第四阶段：安装 md2tgmd
 RUN pip install --no-cache-dir md2tgmd
 
-# 第五阶段：安装 duckduckgo-search 及其依赖
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir cryptography && \
-    pip install --no-cache-dir requests && \
-    pip install --no-cache-dir --no-deps duckduckgo-search && \
-    pip install --no-cache-dir -r <(pip freeze | grep -i "duckduckgo-search" -A 1000)
+# 第五阶段：预安装 duckduckgo-search 的依赖
+RUN pip install --no-cache-dir \
+    requests \
+    click \
+    lxml \
+    beautifulsoup4 \
+    typing-extensions \
+    httpx
+
+# 第六阶段：安装特定版本的 duckduckgo-search
+RUN pip install --no-cache-dir 'duckduckgo-search>=4.1.1'
 
 # 最终阶段：使用精简镜像
 FROM --platform=$TARGETPLATFORM python:3.9.18-slim-bullseye
