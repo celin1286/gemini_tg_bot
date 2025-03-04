@@ -21,15 +21,21 @@ RUN pip config set global.progress_bar off && \
 WORKDIR /app
 COPY requirements.txt .
 
-# 分步安装依赖，设置具体版本号以提高稳定性
+# 第一阶段：基础工具
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir wheel setuptools && \
-    pip install --no-cache-dir pyTelegramBotAPI==4.14.0 && \
-    pip install --no-cache-dir google-generativeai==0.3.2 && \
-    pip install --no-cache-dir aiohttp==3.9.1 && \
-    pip install --no-cache-dir md2tgmd==1.0.2 && \
-    pip install --no-cache-dir google-api-python-client==2.114.0 && \
-    pip install --no-cache-dir "duckduckgo-search>=4.1.1"
+    pip install --no-cache-dir wheel setuptools
+
+# 第二阶段：安装主要依赖
+RUN pip install --no-cache-dir pyTelegramBotAPI && \
+    pip install --no-cache-dir aiohttp
+
+# 第三阶段：安装 Google 相关依赖
+RUN pip install --no-cache-dir google-generativeai && \
+    pip install --no-cache-dir google-api-python-client
+
+# 第四阶段：安装其他依赖
+RUN pip install --no-cache-dir md2tgmd && \
+    pip install --no-cache-dir duckduckgo-search
 
 # 第二阶段：最终镜像
 FROM --platform=linux/amd64 python:3.9.18-slim-bullseye
