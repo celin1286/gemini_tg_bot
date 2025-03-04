@@ -61,14 +61,11 @@ python bot.py
 ### Method 2: Docker Deployment
 
 ```bash
-# Build image
-docker build -t gemini_tg_bot .
-
-# Run container
+# Run container AMD64
 docker run -d --restart=always \
   -e TELEGRAM_BOT_API_KEY="Your_TG_Bot_Token" \
   -e GEMINI_API_KEYS="Your_Gemini_API_Key" \
-  gemini_tg_bot
+  celin1286/gemini_tg_bot:latest
 ```
 
 ## 💬 Usage Guide
