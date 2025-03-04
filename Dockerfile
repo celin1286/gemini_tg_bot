@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     cargo \
     cmake \
     pkg-config \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 创建虚拟环境
@@ -25,7 +26,7 @@ RUN pip config set global.progress_bar off && \
 # 设置 Rust 环境变量
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 ENV RUSTFLAGS="-C target-feature=-crt-static"
-ENV PIP_DEFAULT_TIMEOUT=200
+ENV PIP_DEFAULT_TIMEOUT=300
 
 # 安装依赖
 WORKDIR /app
@@ -48,18 +49,24 @@ RUN pip install --no-cache-dir md2tgmd
 
 # 第五阶段：预安装 duckduckgo-search 的依赖
 RUN pip install --no-cache-dir \
-    requests \
-    click \
-    lxml \
-    beautifulsoup4 \
-    typing-extensions \
-    httpx
+    requests==2.31.0 \
+    click==8.1.7 \
+    lxml==5.1.0 \
+    beautifulsoup4==4.12.3 \
+    typing-extensions==4.9.0 \
+    httpx==0.26.0
 
-# 第六阶段：安装特定版本的 duckduckgo-search
-RUN pip install --no-cache-dir 'duckduckgo-search>=4.1.1'
+# 尝试降级安装特定版本的 duckduckgo-search
+RUN pip install --no-cache-dir duckduckgo-search==4.1.1
 
 # 最终阶段：使用精简镜像
 FROM --platform=$TARGETPLATFORM python:3.9.18-slim-bullseye
+
+# 从构建阶段复制必要的系统库
+COPY --from=builder /usr/lib/aarch64-linux-gnu/libssl.so* /usr/lib/aarch64-linux-gnu/ || true
+COPY --from=builder /usr/lib/aarch64-linux-gnu/libcrypto.so* /usr/lib/aarch64-linux-gnu/ || true
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.so* /usr/lib/x86_64-linux-gnu/ || true
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.so* /usr/lib/x86_64-linux-gnu/ || true
 
 # 复制虚拟环境
 COPY --from=builder /opt/venv /opt/venv
