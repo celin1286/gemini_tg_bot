@@ -1,5 +1,5 @@
 # 使用多阶段构建来减小最终镜像大小
-FROM python:3.9.18-slim-bullseye as builder
+FROM --platform=linux/amd64 python:3.9.18-slim-bullseye as builder
 
 # 安装编译依赖
 RUN apt-get update && apt-get install -y \
@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir "duckduckgo-search>=4.1.1"
 
 # 第二阶段：最终镜像
-FROM python:3.9.18-slim-bullseye
+FROM --platform=linux/amd64 python:3.9.18-slim-bullseye
 
 # 复制虚拟环境
 COPY --from=builder /opt/venv /opt/venv
