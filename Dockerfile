@@ -1,12 +1,15 @@
 # 根据目标平台选择基础镜像
 FROM --platform=$TARGETPLATFORM python:3.9.18-slim-bullseye as builder
 
-# 安装编译依赖
+# 安装编译依赖，为 ARM64 添加额外的依赖
 RUN apt-get update && apt-get install -y \
     gcc \
     python3-dev \
     libffi-dev \
     git \
+    build-essential \
+    rustc \
+    cargo \
     && rm -rf /var/lib/apt/lists/*
 
 # 创建虚拟环境
@@ -16,6 +19,10 @@ ENV PATH="/opt/venv/bin:$PATH"
 # 设置pip配置
 RUN pip config set global.progress_bar off && \
     pip config set global.no-cache-dir true
+
+# 设置环境变量以支持跨平台编译
+ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
+ENV RUSTFLAGS="-C target-feature=-crt-static"
 
 # 安装依赖
 WORKDIR /app
@@ -33,9 +40,9 @@ RUN pip install --no-cache-dir pyTelegramBotAPI && \
 RUN pip install --no-cache-dir google-generativeai && \
     pip install --no-cache-dir google-api-python-client
 
-# 第四阶段：安装其他依赖
-RUN pip install --no-cache-dir md2tgmd && \
-    pip install --no-cache-dir duckduckgo-search
+# 第四阶段：分开安装其他依赖并添加错误处理
+RUN pip install --no-cache-dir --verbose md2tgmd || (echo "Failed to install md2tgmd" && exit 1)
+RUN pip install --no-cache-dir --verbose duckduckgo-search || (echo "Failed to install duckduckgo-search" && exit 1)
 
 # 最终阶段：使用精简镜像
 FROM --platform=$TARGETPLATFORM python:3.9.18-slim-bullseye
